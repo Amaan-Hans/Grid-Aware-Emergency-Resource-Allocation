@@ -75,24 +75,37 @@
     }
 
     function seedNodes() {
-      var count = W < 700 ? 26 : 46;
+      var count = W < 700 ? 40 : 78;
       nodes = [];
       for (var i = 0; i < count; i++) {
+        var isHub = i % 9 === 0;
         nodes.push({
           x: Math.random() * W,
           y: Math.random() * H,
           vx: (Math.random() - 0.5) * 0.18,
           vy: (Math.random() - 0.5) * 0.18,
-          r: Math.random() * 1.6 + 1,
-          hue: Math.random() < 0.72 ? ACCENT : ACCENT2,
-          phase: Math.random() * Math.PI * 2
+          pullX: 0,
+          pullY: 0,
+          pullVX: 0,
+          pullVY: 0,
+          r: isHub ? Math.random() * 1.6 + 3.2 : Math.random() * 1.8 + 1.3,
+          hue: Math.random() < 0.68 ? ACCENT : ACCENT2,
+          phase: Math.random() * Math.PI * 2,
+          isHub: isHub
         });
       }
     }
 
+    // Gravity well: nodes accelerate toward the cursor within PULL_RADIUS,
+    // eased by a spring so they settle back to their drift path on release.
+    var PULL_STRENGTH = 0.055;
+    var PULL_FRICTION = 0.9;
+    var PULL_MAX = 70;
+
     function step(t) {
       ctx.clearRect(0, 0, W, H);
-      var linkDist = W < 700 ? 110 : 150;
+      var linkDist = W < 700 ? 130 : 175;
+      var pullRadius = W < 700 ? 170 : 260;
 
       for (var i = 0; i < nodes.length; i++) {
         var n = nodes[i];
@@ -103,28 +116,47 @@
         if (n.y < -20) n.y = H + 20;
         if (n.y > H + 20) n.y = -20;
 
+        var px = n.x + n.pullX, py = n.y + n.pullY;
+
         if (mouse.x !== null) {
-          var dx = mouse.x - n.x, dy = mouse.y - n.y;
-          var d = Math.sqrt(dx * dx + dy * dy);
-          if (d < 160) {
-            n.x -= dx * 0.0012;
-            n.y -= dy * 0.0012;
+          var dx = mouse.x - px, dy = mouse.y - py;
+          var d = Math.sqrt(dx * dx + dy * dy) || 0.0001;
+          if (d < pullRadius) {
+            var falloff = 1 - d / pullRadius;
+            n.pullVX += (dx / d) * falloff * PULL_STRENGTH * (n.isHub ? 1.4 : 1);
+            n.pullVY += (dy / d) * falloff * PULL_STRENGTH * (n.isHub ? 1.4 : 1);
           }
         }
+
+        n.pullVX *= PULL_FRICTION;
+        n.pullVY *= PULL_FRICTION;
+        n.pullX += n.pullVX;
+        n.pullY += n.pullVY;
+
+        var pullMag = Math.sqrt(n.pullX * n.pullX + n.pullY * n.pullY);
+        if (pullMag > PULL_MAX) {
+          var scale = PULL_MAX / pullMag;
+          n.pullX *= scale;
+          n.pullY *= scale;
+        }
+
+        n.px = n.x + n.pullX;
+        n.py = n.y + n.pullY;
       }
 
       for (var a = 0; a < nodes.length; a++) {
         for (var b = a + 1; b < nodes.length; b++) {
           var na = nodes[a], nb = nodes[b];
-          var ddx = na.x - nb.x, ddy = na.y - nb.y;
+          var ddx = na.px - nb.px, ddy = na.py - nb.py;
           var dist = Math.sqrt(ddx * ddx + ddy * ddy);
           if (dist < linkDist) {
-            var alpha = (1 - dist / linkDist) * 0.16;
-            ctx.strokeStyle = "rgba(" + ACCENT + ", " + alpha + ")";
-            ctx.lineWidth = 1;
+            var linkHue = na.isHub || nb.isHub ? ACCENT2 : ACCENT;
+            var alpha = (1 - dist / linkDist) * 0.55;
+            ctx.strokeStyle = "rgba(" + linkHue + ", " + alpha + ")";
+            ctx.lineWidth = na.isHub || nb.isHub ? 1.3 : 1;
             ctx.beginPath();
-            ctx.moveTo(na.x, na.y);
-            ctx.lineTo(nb.x, nb.y);
+            ctx.moveTo(na.px, na.py);
+            ctx.lineTo(nb.px, nb.py);
             ctx.stroke();
           }
         }
@@ -132,11 +164,17 @@
 
       for (var j = 0; j < nodes.length; j++) {
         var node = nodes[j];
-        var pulse = 0.55 + Math.sin(t * 0.0012 + node.phase) * 0.35;
+        var pulse = node.isHub
+          ? 0.82 + Math.sin(t * 0.0012 + node.phase) * 0.18
+          : 0.72 + Math.sin(t * 0.0012 + node.phase) * 0.26;
+        ctx.save();
+        ctx.shadowBlur = node.isHub ? 14 : 6;
+        ctx.shadowColor = "rgba(" + node.hue + ", 0.9)";
         ctx.beginPath();
-        ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+        ctx.arc(node.px, node.py, node.r, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(" + node.hue + ", " + pulse + ")";
         ctx.fill();
+        ctx.restore();
       }
 
       if (!prefersReducedMotion) {
