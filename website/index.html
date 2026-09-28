@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ansatz</title>
+<meta name="description" content="Ansatz formalizes hard scheduling and dispatch problems as solvable graphs, then finds the optimum on quantum hardware — the part a classical heuristic can approximate but not replicate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <a class="nav__logo" href="#top">ANSATZ<span class="nav__logo-dot">·</span></a>
+  <nav class="nav__links">
+    <a href="#impact">Impact</a>
+    <a href="#graph-problem">Problem</a>
+    <a href="#sectors">Sectors</a>
+    <a href="#investment">Investment</a>
+    <a href="#scope">Scope</a>
+    <a href="#case-study">Case Study</a>
+  </nav>
+  <a class="nav__cta" href="#contact">Book a scoping call</a>
+  <button class="nav__burger" id="navBurger" aria-label="Toggle menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <canvas class="hero__canvas" id="graphCanvas" aria-hidden="true"></canvas>
+    <div class="hero__fade" aria-hidden="true"></div>
+    <div class="wrap hero__content">
+      <p class="eyebrow">Optimization consultancy — inference for the post-quantum age</p>
+      <h1 class="hero__headline">Infrastructure failure is a graph problem.<br>Most operators are solving it with guesses.</h1>
+      <p class="hero__sub">Every grid, network, and fleet you run reduces to nodes and edges under a cost function. When it fails, the failure cascades through that graph — and the gap between a good schedule and the optimal one is paid for in currency and in minutes. Ansatz finds the optimal one.</p>
+      <div class="hero__actions">
+        <a href="#scope" class="btn btn--primary">Scope your problem <span aria-hidden="true">→</span></a>
+        <a href="#graph-problem" class="btn btn--ghost">See why it's hard</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 IMPACT -->
+  <section class="section" id="impact">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">01</div>
+      <div class="section__body">
+        <p class="eyebrow">What's at stake</p>
+        <h2 class="h2 balance">Infrastructure failure gets paid for twice — once in currency, once in response time.</h2>
+        <p class="p">A power utility sheds the wrong feeder group and a hospital generator burns fuel it didn't need to. Every feeder group switched off ripples downstream: traffic lights die at intersections, telecom towers run down finite battery reserves, generators burn fuel on the clock. None of that shows up in the shedding schedule itself — it shows up later, in an ambulance stuck at a dead intersection. We model that ripple as part of the optimization, not as an afterthought.</p>
+
+        <div class="stat-strip">
+          <p class="stat-strip__label">Documented impact — Eskom load shedding, South Africa</p>
+          <div class="stat-strip__row">
+            <div class="stat">
+              <span class="stat__value">R2.9<span class="stat__unit">T</span></span>
+              <span class="stat__label">forfeited by the economy in 2023 alone</span>
+              <span class="stat__note">CSIR Utility Systems Statistics Report, via BusinessTech<sup>1</sup></span>
+            </div>
+            <div class="stat stat--warn">
+              <span class="stat__value">~2,623</span>
+              <span class="stat__label">estimated premature deaths linked to load shedding</span>
+              <span class="stat__note">Cape Town's 65+ population, 2014–2019 (95% CI 452–4,805) — synthetic-control study on MRC mortality data<sup>2</sup></span>
+            </div>
+            <div class="stat">
+              <span class="stat__value">75<span class="stat__unit">%</span></span>
+              <span class="stat__label">of Cape Town's signalised intersections lose backup power at Stage 4+</span>
+              <span class="stat__note">1,228 of 1,652 UPS-equipped intersections can't recharge fast enough once outages deepen<sup>3</sup></span>
+            </div>
+          </div>
+          <p class="fine-print">
+            Sources —
+            1. <a href="https://businesstech.co.za/news/energy/817616/how-much-money-south-africa-lost-to-load-shedding/" target="_blank" rel="noopener">CSIR / BusinessTech, "How much money South Africa lost to load shedding," Mar 2025</a>.
+            2. <a href="https://saldru.uct.ac.za/articles/2024-10-24-less-load-shedding-fewer-deaths" target="_blank" rel="noopener">SALDRU / UCT, "Less load shedding? Fewer deaths," Oct 2024</a>.
+            3. <a href="https://www.iol.co.za/capeargus/news/heres-how-the-city-of-cape-towns-infrastructure-is-impacted-by-high-stages-of-load-shedding-1c9e9513-099f-415b-a471-f7b58e8083bf" target="_blank" rel="noopener">IOL / City of Cape Town infrastructure briefing</a>.
+            The mortality estimate is scoped to Cape Town's 65-and-older population and carries a wide confidence interval — we cite it as documented research, not a national or all-ages figure.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 THE GRAPH PROBLEM -->
+  <section class="section" id="graph-problem">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">02</div>
+      <div class="section__body">
+        <p class="eyebrow">The graph problem</p>
+        <h2 class="h2 balance">Why this is hard, precisely.</h2>
+        <p class="p">Any network of shared, constrained infrastructure reduces to the same shape: a graph. Feeder groups, vehicles, berths, crews, pump stations — whatever the domain, they become nodes. The rules that couple them — shared substations, overlapping shifts, blocked road segments — become edges. Scheduling or allocating across that graph, subject to those edges, is what actually has to be solved. Everything else is implementation detail.</p>
+
+        <div class="anatomy-panel">
+          <dl class="anatomy">
+            <dt>Nodes</dt><dd>The discrete units being scheduled or routed.</dd>
+            <dt>Edges</dt><dd>The constraints and dependencies between them.</dd>
+            <dt>Objective</dt><dd>The cost function being minimized.</dd>
+            <dt>Constraints</dt><dd>The rules that can never be violated — encoded as penalties, not preferences.</dd>
+          </dl>
+        </div>
+
+        <p class="p">The reason this can't be solved by inspection is scale. Eskom alone runs load-shedding across dozens of feeder groups, staged up to eight deep. Treat each feeder group's state in each stage window as one binary decision, and a mid-sized city's shedding schedule alone produces more possible combinations than there are atoms in the observable universe.</p>
+
+        <pre class="code-block" aria-label="Combinatorial scale of the shedding schedule"><code>40 feeder groups × 8 stage windows   = 320 binary variables
+2 ^ 320 possible schedules           ≈ 2.1 × 10^96
+atoms in the observable universe     ≈ 1.0 × 10^80</code></pre>
+
+        <p class="p">No one is checking all of those by hand, in a spreadsheet, or with a greedy solver that commits early and never looks back. Classical heuristics — greedy assignment, simulated annealing — return a schedule, not the schedule. They approximate, and the gap between their answer and the true optimum is exactly the cost and the response-time delay that shows up later, downstream, on someone else's budget.</p>
+
+        <p class="p">It gets harder before it gets more tractable: the objective itself is coupled. What you should shed depends on what it will cost downstream — whose response is delayed, whose pressure zone fails — and that downstream cost depends on what you shed. Solving one layer well requires a signal from the other. That's a bi-level optimization, not a flat schedule, and it's the shape of nearly every infrastructure-failure problem we've been asked to look at.</p>
+
+        <div class="formula">
+          <span>minimize</span>
+          <span class="formula__q">xᵀQx</span>
+          <span class="formula__cond">x ∈ {0,1}ⁿ</span>
+        </div>
+        <p class="p p--small">We cast the objective as a QUBO — a quadratic unconstrained binary optimization — the standard form combinatorial problems take before a quantum solver can touch them. Every hard constraint becomes a penalty term inside Q; every soft preference becomes a weight. The graph goes in, the schedule comes out.</p>
+
+        <p class="p">This is specifically the class of problem where near-term quantum hardware has a credible, testable edge over classical heuristics — not because quantum computers are faster at everything, but because QAOA and VQE explore superpositions across the objective's structure instead of committing to one branch at a time. We benchmark every solve against the best classical heuristic on the identical instance, so the edge is something you can see, not something we ask you to take on faith.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SECTORS -->
+  <section class="section" id="sectors">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">03</div>
+      <div class="section__body">
+        <p class="eyebrow">Where this applies</p>
+        <h2 class="h2 balance">The same graph problem, in six sectors that all run on shared, constrained infrastructure.</h2>
+        <p class="p">Eskom's load-shedding is our proof of concept — the clearest, most measurable version of a problem that shows up anywhere a network like this gets scheduled under uncertainty. Here's the same shape, elsewhere.</p>
+
+        <div class="sector-grid">
+          <div class="sector-card">
+            <p class="sector-card__name">Energy &amp; Utilities</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Substations and feeder groups as nodes, shared load and criticality windows as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>Load shedding cost the South African economy an estimated R2.9 trillion in 2023, then R481 billion in 2024 as the schedule eased — the schedule itself is most of the swing.<sup>1</sup></p>
+          </div>
+          <div class="sector-card">
+            <p class="sector-card__name">Water &amp; Sanitation</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Pump stations, reservoirs, and treatment works as nodes, shared power draw and pipeline capacity as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>South Africa loses an estimated R9.9 billion a year to non-revenue water — pressure and pumping failures that power-loss scheduling compounds.<sup>2</sup></p>
+          </div>
+          <div class="sector-card">
+            <p class="sector-card__name">Telecommunications</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Towers and exchanges as nodes, shared backhaul and finite battery or diesel reserve as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>Vodacom has spent over R4 billion on backup power since 2020; MTN lost R640 million in service revenue to outages in a single year.<sup>3</sup></p>
+          </div>
+          <div class="sector-card">
+            <p class="sector-card__name">Logistics &amp; Fleet</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Vehicles and depots as nodes, time-window and route conflicts as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>Static routing leaves fleet-hours on the table to avoidable detours and idle time, every day it isn't re-solved.</p>
+          </div>
+          <div class="sector-card">
+            <p class="sector-card__name">Healthcare &amp; Emergency Response</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Ambulances, hospitals, and dispatch zones as nodes, response-time-critical road segments as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>EMS utilization rises more than 50% during power outages — right as the intersections ambulances rely on start losing backup power.<sup>4</sup></p>
+          </div>
+          <div class="sector-card">
+            <p class="sector-card__name">Ports &amp; Supply Chain</p>
+            <p class="sector-card__row"><strong>As a graph</strong>Berths, cranes, and vessels as nodes, shared quay and scheduling windows as edges.</p>
+            <p class="sector-card__row"><strong>Where the money is</strong>One delayed vessel cascades through a berthing schedule the same way one shed feeder group cascades through a road network.</p>
+          </div>
+        </div>
+        <p class="fine-print">
+          Sources —
+          1. <a href="https://businesstech.co.za/news/energy/817616/how-much-money-south-africa-lost-to-load-shedding/" target="_blank" rel="noopener">CSIR / BusinessTech</a>.
+          2. <a href="https://pumps-africa.com/addressing-non-revenue-water-in-south-africa/" target="_blank" rel="noopener">National Water &amp; Sanitation Master Plan, via Pumps Africa</a>.
+          3. <a href="https://htxt.co.za/2023/05/vodacom-spends-r4-3-billion-to-survive-loadshedding/" target="_blank" rel="noopener">Hypertext</a> and <a href="https://techcentral.co.za/its-hell-mobile-networks-face-load-shedding-nightmare/224094/" target="_blank" rel="noopener">TechCentral</a>.
+          4. <a href="https://scielo.org.za/scielo.php?script=sci_arttext&amp;pid=S0256-95742019001200003" target="_blank" rel="noopener">SAMJ / SciELO, "Getting out of the dark"</a>.
+          Logistics and port figures describe the general shape of this problem — we haven't found a South Africa-specific public study to cite for them yet, and we'd rather say so than invent one. A consultant sizes the real number for your network, usually inside the first two weeks.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 INVESTMENT -->
+  <section class="section" id="investment">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">04</div>
+      <div class="section__body">
+        <p class="eyebrow">The investment</p>
+        <h2 class="h2 balance">You are not buying a quantum computer. You are buying an answer.</h2>
+        <p class="p">The QPU only enters the picture for a few minutes, at solve time, on hardware we access over the cloud. You don't rack anything, hire a quantum engineering bench, or wait out a multi-year procurement cycle. You get a dispatch policy your existing systems can call over an API.</p>
+
+        <div class="compare">
+          <div class="compare__col compare__col--dim">
+            <p class="compare__title">The assumption we keep correcting</p>
+            <ul class="compare__list">
+              <li>Multi-million-currency quantum hardware, owned and racked on-site</li>
+              <li>An in-house quantum engineering team — 12 to 24 months to hire and ramp</li>
+              <li>Years before a first deployable model</li>
+              <li>Your operational data leaves the building for a research partnership</li>
+            </ul>
+          </div>
+          <div class="compare__col compare__col--accent">
+            <p class="compare__title">What an Ansatz engagement actually requires</p>
+            <ul class="compare__list">
+              <li>Cloud QPU access, billed per solve — never owned, never idle</li>
+              <li>Two consultants embedded with your ops team, 6–10 weeks</li>
+              <li>A working QUBO and a classical benchmark by the end of sprint one</li>
+              <li>A policy deployed against your existing dispatch stack, over an API you control</li>
+            </ul>
+          </div>
+        </div>
+        <p class="callout-line"><span class="mono-tag">TYPICAL ENGAGEMENT</span> Two consultants · 6–10 weeks · one deployable dispatch policy · zero hardware on your books.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 SCOPE / CHATBOT -->
+  <section class="section" id="scope">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">05</div>
+      <div class="section__body">
+        <p class="eyebrow">Scope your problem</p>
+        <h2 class="h2 balance">Describe the network. We'll show you the graph.</h2>
+        <p class="p">Answer three questions about what you're scheduling. This preview turns your own words into the shape of a graph problem — nodes, edges, objective, constraint — the same shape our consultants formalize into a solvable QUBO in week one.</p>
+
+        <div class="scoper">
+          <div class="scoper__panel scoper__chat">
+            <div class="scoper__head">
+              <span class="dot dot--live"></span>
+              <span class="mono-tag">Scoping assistant — preview build</span>
+            </div>
+            <div class="scoper__log" id="scoperLog" aria-live="polite"></div>
+            <form class="scoper__form" id="scoperForm">
+              <input type="text" id="scoperInput" class="scoper__input" autocomplete="off" placeholder="Type your answer…" aria-label="Your answer">
+              <button type="submit" class="btn btn--small">Send</button>
+            </form>
+            <p class="fine-print fine-print--tight">Runs entirely in your browser. In an engagement, this flow is backed by a Gemini-based assistant your consultant tunes to your domain, then hands off to a formal write-up.</p>
+          </div>
+
+          <div class="scoper__panel scoper__spec">
+            <div class="scoper__head">
+              <span class="mono-tag">Your problem, formalized</span>
+            </div>
+            <div class="spec" id="specOutput">
+              <p class="spec__placeholder">Answer the three questions — this fills in as you go.</p>
+            </div>
+            <a href="#contact" class="btn btn--ghost btn--small btn--full" id="specCta" hidden>Send this to a consultant</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 ENGAGEMENT -->
+  <section class="section" id="engagement">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">06</div>
+      <div class="section__body">
+        <p class="eyebrow">How it works</p>
+        <h2 class="h2 balance">Three steps. The last one is the part nobody else can copy.</h2>
+
+        <ol class="steps">
+          <li class="step">
+            <span class="step__num">01</span>
+            <div>
+              <h3 class="step__title">Formalize</h3>
+              <p class="p">Consultants sit with your operations team and turn the rules you already follow into a graph — nodes, edges, and an explicit cost function. This is the Hamiltonian the solver will actually minimize, not a slide-deck approximation of one.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step__num">02</span>
+            <div>
+              <h3 class="step__title">Solve</h3>
+              <p class="p">We run the QUBO on cloud quantum hardware with QAOA or VQE, and benchmark it against a classical heuristic on the identical instance — so you see the gap yourself, not our claim of one.</p>
+            </div>
+          </li>
+          <li class="step">
+            <span class="step__num">03</span>
+            <div>
+              <h3 class="step__title">Deploy</h3>
+              <p class="p">You get a dispatch policy your team calls over an API. Anyone can describe the graph — it's open, we'll hand it to you. Reaching that exact optimum at scale is the part that needs a quantum solve. That's the moat, and it's yours to keep using, not ours to withhold.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 CASE STUDY -->
+  <section class="section" id="case-study">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">07</div>
+      <div class="section__body">
+        <p class="eyebrow">Proof of concept</p>
+        <h2 class="h2 balance">Grid-Aware Emergency Resource Allocation</h2>
+        <p class="p">This is the case study we're solving first, in the open, before we take the model to any other sector. South Africa's Eskom sheds power in stages — each stage removing another 1,000MW of national demand, in rotating blocks that stretch from two hours to four as the stages climb, up to eight stages and 8,000MW deep.<sup>1</sup> Choosing which feeder groups go dark, and when, is already a large constrained combinatorial problem. But the schedule doesn't stop at the substation: it degrades a second network downstream — the one ambulances have to route through, on travel times and reliability the grid layer just changed.</p>
+
+        <div class="case-graphs">
+          <div class="case-graph">
+            <p class="mono-tag">Layer 1 — the grid</p>
+            <p class="case-graph__desc">Feeder groups as nodes, shared-infrastructure and blackout-window constraints as edges. Formulated as a QUBO, solved with QAOA / VQE, benchmarked against simulated annealing.</p>
+          </div>
+          <div class="case-graph case-graph--accent2">
+            <p class="mono-tag">Layer 2 — the response network</p>
+            <p class="case-graph__desc">Intersections, depots, and hospitals as nodes; road segments as edges, with time-varying weights driven by Layer 1's schedule — dead traffic lights, draining backup power.</p>
+          </div>
+        </div>
+
+        <pre class="code-block" aria-label="Cost function"><code>H = A · Σₜ (Σᵢ loadᵢ · xᵢᵗ − target_shedₜ)²     <span class="code-comment">hit the MW shed target per stage</span>
+  + B · Σ_{i ∈ critical} xᵢᵗ                     <span class="code-comment">never shed hospitals / water / telecom</span>
+  + C · Σ_{(i,j) ∈ E₁} xᵢᵗ · xⱼᵗ                  <span class="code-comment">no two coupled groups dark at once</span>
+  + D · Varₜ(Σₜ xᵢᵗ)                              <span class="code-comment">fair rotation across groups</span>
+  + E · Σᵢ riskᵢ · xᵢᵗ                            <span class="code-comment">signal fed back from Layer 2</span></code></pre>
+
+        <div class="loop-diagram" role="img" aria-label="Classical risk model feeds the quantum QUBO solve, which produces a shed schedule, which reshapes the road network, which classical routing then serves.">
+          <span>Classical risk model</span>
+          <span class="loop-diagram__arrow" aria-hidden="true">→</span>
+          <span class="loop-diagram__accent">Quantum QUBO solve</span>
+          <span class="loop-diagram__arrow" aria-hidden="true">→</span>
+          <span>Shed schedule</span>
+          <span class="loop-diagram__arrow" aria-hidden="true">→</span>
+          <span>Road network weights</span>
+          <span class="loop-diagram__arrow" aria-hidden="true">→</span>
+          <span>Classical routing</span>
+        </div>
+        <p class="p">Solving Layer 1 well requires a signal from Layer 2, and Layer 2's inputs are entirely shaped by Layer 1's output — a genuine bi-level loop, not two models bolted together after the fact. It's the same shape of problem we look for in every engagement: two systems that only look separable until someone has to schedule both of them at once.</p>
+        <p class="fine-print">1. <a href="https://loadshedding.eskom.co.za/LoadShedding/ScheduleInterpretation" target="_blank" rel="noopener">Eskom, official load shedding schedule interpretation</a>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section section--contact" id="contact">
+    <div class="wrap section__grid">
+      <div class="section__index" aria-hidden="true">08</div>
+      <div class="section__body">
+        <p class="eyebrow">Get in touch</p>
+        <h2 class="h2 balance">Bring us the schedule that's costing you the most.</h2>
+        <p class="p">Tell us what you're optimizing and where it hurts. A consultant reads every submission personally — no queue, no ticket number.</p>
+
+        <div class="contact-grid">
+          <form class="contact-form" id="contactForm">
+            <div class="field">
+              <label for="cfName">Name</label>
+              <input type="text" id="cfName" name="name" required>
+            </div>
+            <div class="field">
+              <label for="cfOrg">Organization</label>
+              <input type="text" id="cfOrg" name="org" required>
+            </div>
+            <div class="field">
+              <label for="cfProblem">What are you trying to schedule or route?</label>
+              <textarea id="cfProblem" name="problem" rows="4" required></textarea>
+            </div>
+            <button type="submit" class="btn btn--primary btn--full">Request a scoping call</button>
+            <p class="form-status" id="formStatus" role="status"></p>
+          </form>
+
+          <div class="contact-side">
+            <p class="mono-tag">Direct</p>
+            <button class="email-copy" id="emailCopy" type="button">
+              <span id="emailText">hello@ansatz-quantum.com</span>
+              <span class="email-copy__hint" id="emailHint">copy</span>
+            </button>
+            <p class="p p--small">Placeholder contact — swap in the studio's real inbox before launch.</p>
+            <div class="mission">
+              <p class="mono-tag">Why this exists</p>
+              <p class="p p--small">The gap between a good schedule and the optimal one is measured in currency on a spreadsheet and in minutes on a road. We think the second number should decide more of these engagements than it currently does.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__row">
+    <span class="mono-tag">© 2026 ANSATZ — built for social good</span>
+    <div class="footer__links">
+      <a href="#impact">Impact</a>
+      <a href="#graph-problem">Problem</a>
+      <a href="#sectors">Sectors</a>
+      <a href="#investment">Investment</a>
+      <a href="#scope">Scope</a>
+      <a href="#engagement">Engagement</a>
+      <a href="#case-study">Case Study</a>
+    </div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
